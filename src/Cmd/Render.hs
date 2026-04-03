@@ -21,14 +21,14 @@ No brand names, colours, or filenames are hardcoded here.
 -}
 module Main where
 
-import Control.Exception (finally)
-import Control.Monad (forM_, when)
-import Data.Maybe (isJust)
-import Data.Text qualified as T
 import Bricklayer.BrickLayout (BrickLayout (..), layoutToSvg, readBrickLayout)
 import Bricklayer.Compose (PadXMode (..), composeLogoWith, loadFont)
 import Bricklayer.Favicons (generateFavicons)
 import Bricklayer.Raster (exportPng, exportWebp)
+import Control.Exception (finally)
+import Control.Monad (forM_, when)
+import Data.Maybe (isJust)
+import Data.Text qualified as T
 import System.Directory (createDirectoryIfMissing, removeFile)
 import System.Environment (getArgs)
 import System.Exit (exitFailure, exitSuccess)

@@ -3,6 +3,12 @@ module Bricklayer.Blockify (
     aspectCorrectionFactor,
 ) where
 
+import Bricklayer.BrickLayout (
+    BrickGeom (..),
+    BrickLayout,
+    imageAndMapToLayout,
+    mkBrickGeom,
+ )
 import Codec.Picture
 import Data.ByteString qualified as BS
 import Data.List (maximumBy, sort)
@@ -10,12 +16,6 @@ import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe, isJust, isNothing)
 import Data.Ord (comparing)
 import Data.Word (Word8)
-import Bricklayer.BrickLayout (
-    BrickGeom (..),
-    BrickLayout,
-    imageAndMapToLayout,
-    mkBrickGeom,
- )
 import System.Process (StdStream (..), createProcess, proc, std_out, waitForProcess)
 
 type RGB = (Word8, Word8, Word8)

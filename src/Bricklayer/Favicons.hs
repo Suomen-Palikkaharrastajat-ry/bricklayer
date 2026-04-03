@@ -1,7 +1,7 @@
 module Bricklayer.Favicons (generateFavicons) where
 
-import Control.Monad (forM_)
 import Bricklayer.Raster (exportPngSquareTrimmed)
+import Control.Monad (forM_)
 import System.Directory (createDirectoryIfMissing)
 import System.Process (callProcess)
 

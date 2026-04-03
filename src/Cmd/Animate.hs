@@ -13,8 +13,8 @@ No filenames or timings are hardcoded.
 -}
 module Main where
 
-import Control.Monad (when)
 import Bricklayer.Animate (assembleGif, assembleWebp)
+import Control.Monad (when)
 import System.Environment (getArgs)
 import System.Exit (exitFailure, exitSuccess)
 import System.IO (hPutStrLn, stderr)

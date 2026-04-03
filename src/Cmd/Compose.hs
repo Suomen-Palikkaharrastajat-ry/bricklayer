@@ -18,9 +18,6 @@ Without @--tile@ a single @--input@ is copied/recoloured to @--output@.
 -}
 module Main where
 
-import Control.Monad (when)
-import Data.List (intercalate)
-import Data.Text qualified as T
 import Bricklayer.BrickLayout (
     BrickLayout (..),
     RGB,
@@ -30,6 +27,9 @@ import Bricklayer.BrickLayout (
     recolorLayout,
     writeBrickLayout,
  )
+import Control.Monad (when)
+import Data.List (intercalate)
+import Data.Text qualified as T
 import System.Environment (getArgs)
 import System.Exit (exitFailure, exitSuccess)
 import System.IO (hPutStrLn, stderr)
