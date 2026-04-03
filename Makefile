@@ -56,11 +56,11 @@ CABAL       := env PATH="$(_SLIM_PATH)" cabal
 HS_SOURCES := $(shell find src -name '*.hs') bricklayer.cabal $(wildcard cabal.project*)
 
 # ── Output roots ─────────────────────────────────────────────────────────────
-SQ_SVG := dist/square/svg
-SQ_PNG := dist/square/png
-HZ_SVG := dist/horizontal/svg
-HZ_PNG := dist/horizontal/png
-FAVICON := dist/favicon
+SQ_SVG := dist/public/logo/square/svg
+SQ_PNG := dist/public/logo/square/png
+HZ_SVG := dist/public/logo/horizontal/svg
+HZ_PNG := dist/public/logo/horizontal/png
+FAVICON := dist/public
 
 # ── Phony help ────────────────────────────────────────────────────────────────
 
