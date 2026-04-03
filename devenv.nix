@@ -49,7 +49,7 @@ let
         echo "  Cabal:     $(cabal --version | head -1)"
         echo "  rsvg:      $(rsvg-convert --version | head -1)"
         echo ""
-        echo "  make render   — regenerate all logo assets"
+        echo "  make dist     — regenerate all logo assets"
         echo "  make help     — show all targets"
         echo ""
       '';
