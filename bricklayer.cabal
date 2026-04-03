@@ -1,0 +1,68 @@
+cabal-version: 2.2
+name:          bricklayer
+version:       0.1.0.0
+license:       BSD-3-Clause
+build-type:    Simple
+
+library
+  exposed-modules:
+    Bricklayer.BrickLayout, Bricklayer.Blockify, Bricklayer.Compose,
+    Bricklayer.Animate, Bricklayer.Raster, Bricklayer.Favicons
+  hs-source-dirs: src
+  ghc-options: -Wall
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, text, bytestring, base64-bytestring,
+    directory, filepath, process, xml-conduit,
+    JuicyPixels, containers, vector
+
+-- Render a single .blay file to SVG / PNG / WebP + optional subtitle composition.
+-- Generic: no filenames or brand colours are hardcoded.
+executable blay-render
+  main-is: Render.hs
+  hs-source-dirs: src/Cmd
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, bricklayer, text, directory, filepath
+
+-- Draft a new .blay file from a source SVG (rasterise → blockify).
+-- Local developer tool only; not used in CI.
+executable blay-draft
+  main-is: Draft.hs
+  hs-source-dirs: src/Cmd
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, bricklayer
+
+-- Transform .blay files: recolour and/or tile side-by-side.
+-- No filenames, colours, or project specifics are hardcoded.
+executable blay-compose
+  main-is: Compose.hs
+  hs-source-dirs: src/Cmd
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, bricklayer, text
+
+-- Assemble pre-rendered PNG frames into animated GIF / WebP.
+executable blay-animate
+  main-is: Animate.hs
+  hs-source-dirs: src/Cmd
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, bricklayer
+
+test-suite bricklayer-tests
+  type: exitcode-stdio-1.0
+  main-is: TestSuite.hs
+  other-modules:
+    Bricklayer.BlockifySpec
+  hs-source-dirs: tests
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language: GHC2021
+  build-depends:
+    base >=4.7 && <5, text, bytestring, bricklayer,
+    tasty, tasty-hunit, tasty-quickcheck

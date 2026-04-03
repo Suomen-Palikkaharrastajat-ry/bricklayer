@@ -1,0 +1,8 @@
+[formatter.fourmolu]
+command = "fourmolu"
+options = ["--mode", "inplace"]
+includes = ["src/**/*.hs", "app/**/*.hs", "tests/**/*.hs"]
+
+[formatter.nix-format]
+command = "nixfmt"
+includes = ["*.nix"]

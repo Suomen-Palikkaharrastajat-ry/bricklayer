@@ -1,0 +1,36 @@
+# --- Environment / local ---
+.devcontainer.json
+.devenv*
+.direnv
+devenv.local.nix
+devenv.local.yaml
+.env
+
+# --- Dependencies ---
+# Python
+__pycache__/
+*.py[cod]
+
+# --- Haskell build artifacts ---
+dist-newstyle/
+
+# --- Generated / build artifacts (do NOT commit) ---
+# Outputs from the logo pipeline
+dist/
+
+# --- Editor & OS ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Misc / local ---
+.agents/
+.claude/
+.copilot/
+
+# --- Project notes ---
+TODO.md
+TODO*
