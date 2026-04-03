@@ -27,7 +27,7 @@ import Bricklayer.BrickLayout (
     recolorLayout,
     writeBrickLayout,
  )
-import Control.Monad (when)
+import Control.Monad (when, unless)
 import Data.List (intercalate)
 import Data.Text qualified as T
 import System.Environment (getArgs)
@@ -91,7 +91,7 @@ assemble ca bls = do
                 hPutStrLn stderr "blay-compose: warning: --tile has no effect with a single input"
             return bl
         _ -> do
-            when (not (caTile ca)) $ die "multiple --input files require --tile"
+            unless (caTile ca) $ die "multiple --input files require --tile"
             return $ composeLayouts (caGapStuds ca) bls
     let withTop = maybe tiled (\p -> tiled{blPadTop = p}) (caPadTop ca)
         withBot = maybe withTop (\p -> withTop{blPadBottom = p}) (caPadBottom ca)
