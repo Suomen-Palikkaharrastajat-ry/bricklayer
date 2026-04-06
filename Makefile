@@ -307,6 +307,42 @@ $(SQ_SVG)/square-smile.svg $(SQ_PNG)/square-smile.png $(SQ_PNG)/square-smile.web
 	  --width $(RASTER_W) \
 	  --favicon-dir $(FAVICON)
 
+# Web metadata / PWA icon aliases (framework-friendly filenames)
+# Source files are produced by --favicon-dir above.
+$(FAVICON)/favicon-16x16.png: $(FAVICON)/favicon-16.png
+	cp $< $@
+
+$(FAVICON)/favicon-32x32.png: $(FAVICON)/favicon-32.png
+	cp $< $@
+
+$(FAVICON)/favicon-48x48.png: $(FAVICON)/favicon-48.png
+	cp $< $@
+
+$(FAVICON)/android-chrome-192x192.png: $(FAVICON)/icon-192.png
+	cp $< $@
+
+$(FAVICON)/android-chrome-512x512.png: $(FAVICON)/icon-512.png
+	cp $< $@
+
+$(FAVICON)/icon-maskable.png: $(FAVICON)/icon-512.png
+	cp $< $@
+
+$(FAVICON)/favicon.svg: $(SQ_SVG)/square-smile.svg
+	cp $< $@
+
+WEB_ICON_OUTPUTS := \
+  $(FAVICON)/favicon.ico \
+  $(FAVICON)/favicon.svg \
+  $(FAVICON)/apple-touch-icon.png \
+  $(FAVICON)/favicon-16x16.png \
+  $(FAVICON)/favicon-32x32.png \
+  $(FAVICON)/favicon-48x48.png \
+  $(FAVICON)/icon-192.png \
+  $(FAVICON)/icon-512.png \
+  $(FAVICON)/android-chrome-192x192.png \
+  $(FAVICON)/android-chrome-512x512.png \
+  $(FAVICON)/icon-maskable.png
+
 # Square logo with two-line centered text below (normal + bold, light + dark)
 $(SQ_SVG)/square-smile-full.svg $(SQ_PNG)/square-smile-full.png $(SQ_PNG)/square-smile-full.webp \
 $(SQ_SVG)/square-smile-full-dark.svg $(SQ_PNG)/square-smile-full-dark.png $(SQ_PNG)/square-smile-full-dark.webp \
@@ -443,7 +479,7 @@ outline-text: $(ALL_FULL_SVGS) ## Outline subtitle text in composed horizontal S
 
 # ── render: all static logo assets ───────────────────────────────────────────
 
-dist: $(ALL_SQ_OUTPUTS) $(ALL_HZ_OUTPUTS) $(ALL_ANIMATIONS) $(FAVICON)/favicon.ico ## Render all .blay files to dist/
+dist: $(ALL_SQ_OUTPUTS) $(ALL_HZ_OUTPUTS) $(ALL_ANIMATIONS) $(WEB_ICON_OUTPUTS) ## Render all .blay files to dist/
 
 all: dist
 
