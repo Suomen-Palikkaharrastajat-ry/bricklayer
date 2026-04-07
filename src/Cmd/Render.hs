@@ -56,6 +56,7 @@ data RenderArgs = RenderArgs
     , raComposeTextWeight :: Int -- font-weight value (e.g. 400, 700)
     , raComposeLightColor :: String -- 6-digit hex, no '#'
     , raComposeDarkColor :: String -- 6-digit hex, no '#'
+    , raComposeBgColor :: String -- 6-digit hex, no '#'; empty = transparent
     , raComposeSvgOut :: Maybe FilePath
     , raComposeDarkSvgOut :: Maybe FilePath
     , raComposePngOut :: Maybe FilePath
@@ -86,6 +87,7 @@ defaultArgs =
         , raComposeTextWeight = 400
         , raComposeLightColor = "05131D"
         , raComposeDarkColor = "FFFFFF"
+        , raComposeBgColor = ""
         , raComposeSvgOut = Nothing
         , raComposeDarkSvgOut = Nothing
         , raComposePngOut = Nothing
@@ -159,10 +161,13 @@ runRender ra = do
                 if raComposeSquare ra
                     then AutoSquare
                     else FixedPadX (raComposePadX ra)
+            mBgColor =
+                let s = raComposeBgColor ra
+                 in if null s then Nothing else Just (T.pack $ "#" ++ s)
 
         when lightNeeded $ do
             let col = T.pack $ "#" ++ raComposeLightColor ra
-                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize
+                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize mBgColor
             renderComposeVariant
                 ra
                 cSvg
@@ -173,7 +178,7 @@ runRender ra = do
 
         when darkNeeded $ do
             let col = T.pack $ "#" ++ raComposeDarkColor ra
-                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize
+                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize mBgColor
             renderComposeVariant
                 ra
                 cSvg
@@ -263,6 +268,7 @@ parseArgs (f : v : rest) ra = case f of
     "--compose-text-weight" -> readInt f v >>= \n -> parseArgs rest ra{raComposeTextWeight = n}
     "--compose-light-color" -> parseArgs rest ra{raComposeLightColor = v}
     "--compose-dark-color" -> parseArgs rest ra{raComposeDarkColor = v}
+    "--compose-background" -> parseArgs rest ra{raComposeBgColor = v}
     "--compose-svg-out" -> parseArgs rest ra{raComposeSvgOut = Just v}
     "--compose-dark-svg-out" -> parseArgs rest ra{raComposeDarkSvgOut = Just v}
     "--compose-png-out" -> parseArgs rest ra{raComposePngOut = Just v}
@@ -309,6 +315,7 @@ usageText =
         , "  --compose-text-weight N     Subtitle font weight        [default: 400]"
         , "  --compose-light-color HEX   Light subtitle colour       [default: 05131D]"
         , "  --compose-dark-color HEX    Dark subtitle colour        [default: FFFFFF]"
+        , "  --compose-background HEX    Background fill colour      [default: transparent]"
         , "  --compose-svg-out FILE      Light composed SVG"
         , "  --compose-dark-svg-out FILE Dark composed SVG"
         , "  --compose-png-out FILE      Light composed PNG"

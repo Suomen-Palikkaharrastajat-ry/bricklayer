@@ -89,8 +89,10 @@ composeLogoWith ::
     PadXMode ->
     -- | Optional explicit output canvas (width, height)
     Maybe (Int, Int) ->
+    -- | Optional background fill colour (e.g. @Just \"#05131D\"@)
+    Maybe Text ->
     Text
-composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize =
+composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize mBgColor =
     let (brickW, brickH) = parseSvgDimensions srcText
         lineGap = (txtSize * 13) `div` 10 -- 1.3× line spacing for second line
         intrinsicCanvasH =
@@ -137,6 +139,7 @@ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText tx
             lineGap
             (intrinsicTranslateX + outerOffsetX)
             outerOffsetY
+            mBgColor
 
 -- | Convenience wrapper: load the font from disk then call 'composeLogoWith'.
 composeLogoFrom ::
@@ -158,10 +161,12 @@ composeLogoFrom ::
     PadXMode ->
     -- | Optional explicit output canvas (width, height)
     Maybe (Int, Int) ->
+    -- | Optional background fill colour (e.g. @Just \"#05131D\"@)
+    Maybe Text ->
     IO Text
-composeLogoFrom fontPath subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize = do
+composeLogoFrom fontPath subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize mBgColor = do
     fontDataUri <- loadFont fontPath
-    return $ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize
+    return $ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize mBgColor
 
 -- ── Internal SVG builder ─────────────────────────────────────────────────────
 
@@ -192,8 +197,10 @@ buildFullSvg ::
     Double ->
     -- | vertical offset for the whole composed block (SVG units)
     Double ->
+    -- | optional background fill colour
+    Maybe Text ->
     Text
-buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fontDataUri subtitleText mSubtitleText2 lineGap translateX offsetY =
+buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fontDataUri subtitleText mSubtitleText2 lineGap translateX offsetY mBgColor =
     T.concat
         [ "<?xml version='1.0' encoding='utf-8'?>\n"
         , "<svg"
@@ -203,6 +210,9 @@ buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fon
         , " viewBox=\"0 0 " <> showI canvasW <> " " <> showI canvasH <> "\""
         , ">\n"
         , defsElem
+        , case mBgColor of
+            Nothing -> ""
+            Just bg -> "<rect width=\"" <> showI canvasW <> "\" height=\"" <> showI canvasH <> "\" fill=\"" <> bg <> "\"/>\n"
         , if translateX > 0 || offsetY /= 0
             then
                 "<g transform=\"translate("

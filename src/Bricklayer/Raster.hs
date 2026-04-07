@@ -48,8 +48,8 @@ Steps:
 Only the content bounding box is used; transparent letterbox/pillarbox
 from pad-left/pad-right/pad-top/pad-bottom in the source layout is removed.
 -}
-exportPngSquareTrimmed :: FilePath -> FilePath -> Int -> IO ()
-exportPngSquareTrimmed svgIn pngOut sizePx = do
+exportPngSquareTrimmed :: FilePath -> FilePath -> Int -> String -> IO ()
+exportPngSquareTrimmed svgIn pngOut sizePx bgColor = do
     putStrLn $ "  raster (square, trimmed) " ++ svgIn ++ " -> " ++ pngOut
     let sz = show sizePx
         renderSz = show (max 512 (sizePx * 8))
@@ -86,7 +86,7 @@ exportPngSquareTrimmed svgIn pngOut sizePx = do
         , "-gravity"
         , "center"
         , "-background"
-        , "transparent"
+        , bgColor
         , "-extent"
         , dim ++ "x" ++ dim
         , "-resize"

@@ -14,8 +14,8 @@ generateFavicons :: FilePath -> FilePath -> IO ()
 generateFavicons squareSvgPath faviconDir = do
     createDirectoryIfMissing True faviconDir
 
-    forM_ sizes $ \(sz, name) ->
-        exportPngSquareTrimmed squareSvgPath (faviconDir ++ "/" ++ name ++ ".png") sz
+    forM_ sizes $ \(sz, name, bg) ->
+        exportPngSquareTrimmed squareSvgPath (faviconDir ++ "/" ++ name ++ ".png") sz bg
 
     -- Bundle 16, 32, 48, 64px PNGs into a multi-size favicon.ico
     callProcess
@@ -31,19 +31,21 @@ generateFavicons squareSvgPath faviconDir = do
 
     putStrLn $ "  Wrote " ++ faviconDir ++ "/favicon.ico"
   where
-    sizes :: [(Int, String)]
+    sizes :: [(Int, String, String)]
     sizes =
-        -- Browser favicons
-        [ (16, "favicon-16")
-        , (32, "favicon-32")
-        , (48, "favicon-48")
-        , (64, "favicon-64")
-        , -- Apple touch icons
-          (120, "apple-touch-icon-120")
-        , (152, "apple-touch-icon-152")
-        , (167, "apple-touch-icon-167")
-        , (180, "apple-touch-icon")
-        , -- PWA icons
-          (192, "icon-192")
-        , (512, "icon-512")
+        -- Browser favicons (transparent — browsers render over tab chrome)
+        [ (16, "favicon-16", "transparent")
+        , (32, "favicon-32", "transparent")
+        , (48, "favicon-48", "transparent")
+        , (64, "favicon-64", "transparent")
+        , -- Apple touch icons (#05131D — iOS does not support transparency)
+          (120, "apple-touch-icon-120", "#05131D")
+        , (152, "apple-touch-icon-152", "#05131D")
+        , (167, "apple-touch-icon-167", "#05131D")
+        , (180, "apple-touch-icon", "#05131D")
+        , -- PWA icons (#05131D — Android webmanifest does not support transparency)
+          (192, "icon-192", "#05131D")
+        , (512, "icon-512", "#05131D")
+        , -- Maskable icon (transparent — OS applies adaptive mask and supplies background)
+          (512, "icon-maskable", "transparent")
         ]
