@@ -314,24 +314,6 @@ $(SQ_SVG)/square-smile.svg $(SQ_PNG)/square-smile.png $(SQ_PNG)/square-smile.web
 	  --width $(RASTER_W) \
 	  --favicon-dir $(FAVICON)
 
-# Web metadata / PWA icon aliases (framework-friendly filenames)
-# Source files are produced by --favicon-dir above.
-$(FAVICON)/favicon-16x16.png: $(FAVICON)/favicon-16.png
-	cp $< $@
-
-$(FAVICON)/favicon-32x32.png: $(FAVICON)/favicon-32.png
-	cp $< $@
-
-$(FAVICON)/favicon-48x48.png: $(FAVICON)/favicon-48.png
-	cp $< $@
-
-$(FAVICON)/android-chrome-192x192.png: $(FAVICON)/icon-192.png
-	cp $< $@
-
-$(FAVICON)/android-chrome-512x512.png: $(FAVICON)/icon-512.png
-	cp $< $@
-
-
 $(FAVICON)/favicon.svg: $(SQ_SVG)/square-smile.svg
 	cp $< $@
 
@@ -346,8 +328,6 @@ WEB_ICON_OUTPUTS := \
   $(FAVICON)/favicon-48x48.png \
   $(FAVICON)/icon-192.png \
   $(FAVICON)/icon-512.png \
-  $(FAVICON)/android-chrome-192x192.png \
-  $(FAVICON)/android-chrome-512x512.png \
   $(FAVICON)/icon-maskable.png
 
 # Default Open Graph image: horizontal full dark bold on a 1200x630 canvas
