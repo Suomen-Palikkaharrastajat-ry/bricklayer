@@ -11,9 +11,11 @@ SQ_PAD_V  := 20
 HZ_PAD_TOP:= 20
 GAP_STUDS := 2
 TXT_SIZE       := 63
+TXT_SIZE_BOLD  := 60
 TXT_SIZE_SQ    := 24
+TXT_SIZE_SQ_BOLD := 22
 TXT_WEIGHT_BOLD := 700
-HZ_BOLD_PAD_X  := 40
+HZ_BOLD_PAD_X  := 0
 SUBTITLE_LINE1 := Suomen
 SUBTITLE_LINE2 := Palikkaharrastajat ry
 ANIM_MS        := 10000
@@ -209,7 +211,7 @@ _COMPOSE_FLAGS_BOLD := \
   --compose-font '$(FONT_PATH)' \
   --compose-text '$(SUBTITLE)' \
   --compose-text-weight $(TXT_WEIGHT_BOLD) \
-  --compose-text-size $(TXT_SIZE) \
+  --compose-text-size $(TXT_SIZE_BOLD) \
   --compose-light-color $(SUBTITLE_LIGHT) \
   --compose-dark-color $(SUBTITLE_DARK) \
   --compose-pad-bottom 0 \
@@ -231,7 +233,7 @@ _COMPOSE_FLAGS_SQ_BOLD := \
   --compose-text '$(SUBTITLE_LINE1)' \
   --compose-text2 '$(SUBTITLE_LINE2)' \
   --compose-text-weight $(TXT_WEIGHT_BOLD) \
-  --compose-text-size $(TXT_SIZE_SQ) \
+  --compose-text-size $(TXT_SIZE_SQ_BOLD) \
   --compose-light-color $(SUBTITLE_LIGHT) \
   --compose-dark-color $(SUBTITLE_DARK) \
   --compose-pad-bottom 0 \
@@ -302,7 +304,7 @@ $(foreach s,$(_SQ_DERIVED),$(eval $(call render_square,$(s))))
 $(foreach s,$(HZ_STEMS),$(eval $(call render_horizontal,$(s))))
 
 # Favicons — generated alongside the square-smile PNG (the primary neutral face)
-$(SQ_SVG)/square-smile.svg $(SQ_PNG)/square-smile.png $(SQ_PNG)/square-smile.webp $(FAVICON)/favicon.ico &: layouts/square-smile.blay $(HS_SOURCES) | build
+$(SQ_SVG)/square-smile.svg $(SQ_PNG)/square-smile.png $(SQ_PNG)/square-smile.webp $(FAVICON)/favicon.ico $(FAVICON)/icon-maskable.png &: layouts/square-smile.blay $(HS_SOURCES) | build
 	@mkdir -p $(SQ_SVG) $(SQ_PNG) $(FAVICON)
 	$(_RENDER) \
 	  --input    layouts/square-smile.blay \
@@ -329,8 +331,6 @@ $(FAVICON)/android-chrome-192x192.png: $(FAVICON)/icon-192.png
 $(FAVICON)/android-chrome-512x512.png: $(FAVICON)/icon-512.png
 	cp $< $@
 
-$(FAVICON)/icon-maskable.png: $(FAVICON)/icon-512.png
-	cp $< $@
 
 $(FAVICON)/favicon.svg: $(SQ_SVG)/square-smile.svg
 	cp $< $@
@@ -355,6 +355,7 @@ $(OG_SVG) $(OG_PNG) $(OG_WEBP) &: layouts/horizontal.blay $(FONT_PATH) $(HS_SOUR
 	  --input layouts/horizontal.blay \
 	  --width $(OG_W) \
 	  $(_COMPOSE_FLAGS_BOLD) \
+	  --compose-background    $(SUBTITLE_LIGHT) \
 	  --compose-canvas-width  $(OG_W) \
 	  --compose-canvas-height $(OG_H) \
 	  --compose-svg-out       $(OG_SVG) \
