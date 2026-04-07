@@ -18,6 +18,8 @@ SUBTITLE_LINE1 := Suomen
 SUBTITLE_LINE2 := Palikkaharrastajat ry
 ANIM_MS        := 10000
 RASTER_W  := 800
+OG_W      := 1200
+OG_H      := 630
 
 # Subtitle colours (6-digit hex, no #)
 SUBTITLE_LIGHT := 05131D
@@ -61,6 +63,9 @@ SQ_PNG := dist/public/logo/square/png
 HZ_SVG := dist/public/logo/horizontal/svg
 HZ_PNG := dist/public/logo/horizontal/png
 FAVICON := dist/public
+OG_SVG  := $(FAVICON)/og-image.svg
+OG_PNG  := $(FAVICON)/og-image.png
+OG_WEBP := $(FAVICON)/og-image.webp
 
 # ── Phony help ────────────────────────────────────────────────────────────────
 
@@ -343,6 +348,21 @@ WEB_ICON_OUTPUTS := \
   $(FAVICON)/android-chrome-512x512.png \
   $(FAVICON)/icon-maskable.png
 
+# Default Open Graph image: horizontal full bold on a 1200x630 canvas
+$(OG_SVG) $(OG_PNG) $(OG_WEBP) &: layouts/horizontal.blay $(FONT_PATH) $(HS_SOURCES) | build
+	@mkdir -p $(FAVICON)
+	$(_RENDER) \
+	  --input layouts/horizontal.blay \
+	  --width $(OG_W) \
+	  $(_COMPOSE_FLAGS_BOLD) \
+	  --compose-canvas-width  $(OG_W) \
+	  --compose-canvas-height $(OG_H) \
+	  --compose-svg-out       $(OG_SVG) \
+	  --compose-png-out       $(OG_PNG) \
+	  --compose-webp-out      $(OG_WEBP)
+
+OG_IMAGE_OUTPUTS := $(OG_SVG) $(OG_PNG) $(OG_WEBP)
+
 # Square logo with two-line centered text below (normal + bold, light + dark)
 $(SQ_SVG)/square-smile-full.svg $(SQ_PNG)/square-smile-full.png $(SQ_PNG)/square-smile-full.webp \
 $(SQ_SVG)/square-smile-full-dark.svg $(SQ_PNG)/square-smile-full-dark.png $(SQ_PNG)/square-smile-full-dark.webp \
@@ -471,7 +491,8 @@ ALL_ANIMATIONS := \
 # ── Text outlining (post-process full composed SVGs) ─────────────────────────
 ALL_FULL_SVGS := $(foreach s,$(HZ_STEMS),$(HZ_SVG)/$(s)-full.svg $(HZ_SVG)/$(s)-full-dark.svg $(HZ_SVG)/$(s)-full-bold.svg $(HZ_SVG)/$(s)-full-dark-bold.svg) \
   $(SQ_SVG)/square-smile-full.svg $(SQ_SVG)/square-smile-full-dark.svg \
-  $(SQ_SVG)/square-smile-full-bold.svg $(SQ_SVG)/square-smile-full-dark-bold.svg
+  $(SQ_SVG)/square-smile-full-bold.svg $(SQ_SVG)/square-smile-full-dark-bold.svg \
+  $(OG_SVG)
 
 .PHONY: outline-text
 outline-text: $(ALL_FULL_SVGS) ## Outline subtitle text in composed horizontal SVGs
@@ -479,7 +500,7 @@ outline-text: $(ALL_FULL_SVGS) ## Outline subtitle text in composed horizontal S
 
 # ── render: all static logo assets ───────────────────────────────────────────
 
-dist: $(ALL_SQ_OUTPUTS) $(ALL_HZ_OUTPUTS) $(ALL_ANIMATIONS) $(WEB_ICON_OUTPUTS) ## Render all .blay files to dist/
+dist: $(ALL_SQ_OUTPUTS) $(ALL_HZ_OUTPUTS) $(ALL_ANIMATIONS) $(WEB_ICON_OUTPUTS) $(OG_IMAGE_OUTPUTS) ## Render all .blay files to dist/
 
 all: dist
 
