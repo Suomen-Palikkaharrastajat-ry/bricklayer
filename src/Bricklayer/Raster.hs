@@ -75,7 +75,9 @@ exportPngSquareTrimmed svgIn pngOut sizePx = do
     -- with a concrete geometry string.  Using %w/%h avoids FX expressions
     -- that are not supported by ImageMagick 6's -extent argument.
     dimStr <- readProcess "identify" ["-format", "%w %h", tmpTrim] ""
-    let [w, h] = map (read :: String -> Int) (words dimStr)
+    let (w, h) = case words dimStr of
+                    [ws, hs] -> (read ws :: Int, read hs :: Int)
+                    _ -> error $ "identify: unexpected output: " ++ dimStr
         dim = show (max w h)
     -- Step 3: pad to square and scale to final size.
     callProcess
