@@ -339,6 +339,8 @@ WEB_ICON_OUTPUTS := \
   $(FAVICON)/favicon.ico \
   $(FAVICON)/favicon.svg \
   $(FAVICON)/apple-touch-icon.png \
+  $(FAVICON)/apple-touch-icon-192.png \
+  $(FAVICON)/apple-touch-icon-512.png \
   $(FAVICON)/favicon-16x16.png \
   $(FAVICON)/favicon-32x32.png \
   $(FAVICON)/favicon-48x48.png \

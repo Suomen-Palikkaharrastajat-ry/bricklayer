@@ -27,7 +27,7 @@ import Bricklayer.BrickLayout (
     recolorLayout,
     writeBrickLayout,
  )
-import Control.Monad (when, unless)
+import Control.Monad (unless, when)
 import Data.List (intercalate)
 import Data.Text qualified as T
 import System.Environment (getArgs)

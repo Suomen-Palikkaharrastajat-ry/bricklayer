@@ -76,8 +76,8 @@ exportPngSquareTrimmed svgIn pngOut sizePx bgColor = do
     -- that are not supported by ImageMagick 6's -extent argument.
     dimStr <- readProcess "identify" ["-format", "%w %h", tmpTrim] ""
     let (w, h) = case words dimStr of
-                    [ws, hs] -> (read ws :: Int, read hs :: Int)
-                    _ -> error $ "identify: unexpected output: " ++ dimStr
+            [ws, hs] -> (read ws :: Int, read hs :: Int)
+            _ -> error $ "identify: unexpected output: " ++ dimStr
         dim = show (max w h)
     -- Step 3: pad to square and scale to final size.
     callProcess
