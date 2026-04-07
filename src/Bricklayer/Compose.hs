@@ -87,11 +87,13 @@ composeLogoWith ::
     Int ->
     -- | Horizontal padding mode
     PadXMode ->
+    -- | Optional explicit output canvas (width, height)
+    Maybe (Int, Int) ->
     Text
-composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode =
+composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize =
     let (brickW, brickH) = parseSvgDimensions srcText
         lineGap = (txtSize * 13) `div` 10 -- 1.3× line spacing for second line
-        canvasH =
+        intrinsicCanvasH =
             brickH
                 + _GAP
                 + txtSize
@@ -99,14 +101,27 @@ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText tx
                 + _BOTTOM_PAD
         -- For AutoSquare: canvasW = canvasH exactly (guaranteed square regardless
         -- of parity), translate the brick group by a fractional SVG offset.
-        (canvasW, translateX) = case padXMode of
+        (intrinsicCanvasW, intrinsicTranslateX) = case padXMode of
             FixedPadX n ->
                 ( brickW + 2 * n
                 , fromIntegral n :: Double
                 )
             AutoSquare ->
-                ( canvasH
-                , fromIntegral (canvasH - brickW) / 2.0
+                ( intrinsicCanvasH
+                , fromIntegral (intrinsicCanvasH - brickW) / 2.0
+                )
+        (canvasW, canvasH, outerOffsetX, outerOffsetY) = case mCanvasSize of
+            Nothing ->
+                ( intrinsicCanvasW
+                , intrinsicCanvasH
+                , 0.0 :: Double
+                , 0.0 :: Double
+                )
+            Just (targetW, targetH) ->
+                ( targetW
+                , targetH
+                , fromIntegral (targetW - intrinsicCanvasW) / 2.0
+                , fromIntegral (targetH - intrinsicCanvasH) / 2.0
                 )
      in buildFullSvg
             srcText
@@ -120,7 +135,8 @@ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText tx
             subtitleText
             mSubtitleText2
             lineGap
-            translateX
+            (intrinsicTranslateX + outerOffsetX)
+            outerOffsetY
 
 -- | Convenience wrapper: load the font from disk then call 'composeLogoWith'.
 composeLogoFrom ::
@@ -140,10 +156,12 @@ composeLogoFrom ::
     Int ->
     -- | Horizontal padding mode
     PadXMode ->
+    -- | Optional explicit output canvas (width, height)
+    Maybe (Int, Int) ->
     IO Text
-composeLogoFrom fontPath subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode = do
+composeLogoFrom fontPath subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize = do
     fontDataUri <- loadFont fontPath
-    return $ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode
+    return $ composeLogoWith fontDataUri subtitleText mSubtitleText2 subtitleColor srcText txtSize fontWeight padXMode mCanvasSize
 
 -- ── Internal SVG builder ─────────────────────────────────────────────────────
 
@@ -172,8 +190,10 @@ buildFullSvg ::
     Int ->
     -- | brick group translate-X (SVG units, may be fractional)
     Double ->
+    -- | vertical offset for the whole composed block (SVG units)
+    Double ->
     Text
-buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fontDataUri subtitleText mSubtitleText2 lineGap translateX =
+buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fontDataUri subtitleText mSubtitleText2 lineGap translateX offsetY =
     T.concat
         [ "<?xml version='1.0' encoding='utf-8'?>\n"
         , "<svg"
@@ -183,8 +203,13 @@ buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fon
         , " viewBox=\"0 0 " <> showI canvasW <> " " <> showI canvasH <> "\""
         , ">\n"
         , defsElem
-        , if translateX > 0
-            then "<g transform=\"translate(" <> T.pack (show translateX) <> ",0)\">"
+        , if translateX > 0 || offsetY /= 0
+            then
+                "<g transform=\"translate("
+                    <> T.pack (show translateX)
+                    <> ","
+                    <> T.pack (show offsetY)
+                    <> ")\">"
             else "<g>"
         , innerContent srcText
         , "</g>"
@@ -204,10 +229,10 @@ buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fon
                 )
             <> "</style></defs>"
 
-    cx = canvasW `div` 2
+    cx = fromIntegral canvasW / 2.0 :: Double
 
     -- y1: baseline of first text line
-    y1 = brickH + _GAP + txtSize
+    y1 = fromIntegral (brickH + _GAP + txtSize) + offsetY
 
     sharedAttrs =
         " font-family=\"Outfit, sans-serif\""
@@ -225,10 +250,10 @@ buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fon
     mkTextElem y txt =
         "<text"
             <> " x=\""
-            <> showI cx
+            <> T.pack (show cx)
             <> "\""
             <> " y=\""
-            <> T.pack (show (fromIntegral y :: Double))
+            <> T.pack (show y)
             <> "\""
             <> sharedAttrs
             <> ">"
@@ -239,7 +264,7 @@ buildFullSvg srcText canvasW canvasH brickH txtSize fontWeight subtitleColor fon
         mkTextElem y1 subtitleText
             <> case mSubtitleText2 of
                 Nothing -> ""
-                Just line2 -> mkTextElem (y1 + lineGap) line2
+                Just line2 -> mkTextElem (y1 + fromIntegral lineGap) line2
 
     innerContent t =
         let noDecl = snd $ T.breakOn "<svg" t

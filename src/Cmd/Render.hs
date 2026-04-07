@@ -47,6 +47,8 @@ data RenderArgs = RenderArgs
       raComposePadBottom :: Maybe Int -- override pad-bottom for compose SVG
     , raComposePadX :: Int -- extra horizontal padding each side (SVG px)
     , raComposeSquare :: Bool -- auto-pad horizontally so canvas is square
+    , raComposeCanvasWidth :: Maybe Int -- explicit composed canvas width
+    , raComposeCanvasHeight :: Maybe Int -- explicit composed canvas height
     , raComposeFont :: Maybe FilePath
     , raComposeText :: String
     , raComposeText2 :: String -- optional second subtitle line (empty = none)
@@ -75,6 +77,8 @@ defaultArgs =
         , raComposePadBottom = Nothing
         , raComposePadX = 0
         , raComposeSquare = False
+        , raComposeCanvasWidth = Nothing
+        , raComposeCanvasHeight = Nothing
         , raComposeFont = Nothing
         , raComposeText = ""
         , raComposeText2 = ""
@@ -144,6 +148,7 @@ runRender ra = do
     when (lightNeeded || darkNeeded) $ do
         font <- requireArg "--compose-font" (raComposeFont ra)
         fontDataUri <- loadFont font
+        mCanvasSize <- requireCanvasSize ra
         let subtitleText = T.pack (raComposeText ra)
             mSubtitleText2 =
                 let s = raComposeText2 ra
@@ -157,7 +162,7 @@ runRender ra = do
 
         when lightNeeded $ do
             let col = T.pack $ "#" ++ raComposeLightColor ra
-                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode
+                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize
             renderComposeVariant
                 ra
                 cSvg
@@ -168,7 +173,7 @@ runRender ra = do
 
         when darkNeeded $ do
             let col = T.pack $ "#" ++ raComposeDarkColor ra
-                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode
+                cSvg = composeLogoWith fontDataUri subtitleText mSubtitleText2 col svgTextForCompose textSize fontWeight padXMode mCanvasSize
             renderComposeVariant
                 ra
                 cSvg
@@ -229,6 +234,12 @@ requireArg :: String -> Maybe a -> IO a
 requireArg flag Nothing = die $ flag ++ " is required for compose outputs"
 requireArg _ (Just x) = return x
 
+requireCanvasSize :: RenderArgs -> IO (Maybe (Int, Int))
+requireCanvasSize ra = case (raComposeCanvasWidth ra, raComposeCanvasHeight ra) of
+    (Nothing, Nothing) -> return Nothing
+    (Just w, Just h) -> return $ Just (w, h)
+    _ -> die "--compose-canvas-width and --compose-canvas-height must be used together"
+
 -- Arg parsing
 
 parseArgs :: [String] -> RenderArgs -> Either String RenderArgs
@@ -243,6 +254,8 @@ parseArgs (f : v : rest) ra = case f of
     "--width" -> readInt f v >>= \n -> parseArgs rest ra{raWidth = n}
     "--compose-pad-bottom" -> readInt f v >>= \n -> parseArgs rest ra{raComposePadBottom = Just n}
     "--compose-pad-x" -> readInt f v >>= \n -> parseArgs rest ra{raComposePadX = n}
+    "--compose-canvas-width" -> readInt f v >>= \n -> parseArgs rest ra{raComposeCanvasWidth = Just n}
+    "--compose-canvas-height" -> readInt f v >>= \n -> parseArgs rest ra{raComposeCanvasHeight = Just n}
     "--compose-font" -> parseArgs rest ra{raComposeFont = Just v}
     "--compose-text" -> parseArgs rest ra{raComposeText = v}
     "--compose-text2" -> parseArgs rest ra{raComposeText2 = v}
@@ -287,6 +300,8 @@ usageText =
         , "  --compose-pad-bottom N      Override pad-bottom for the compose SVG (e.g. 0)"
         , "  --compose-pad-x N           Extra horizontal padding each side (SVG px) [default: 0]"
         , "  --compose-square            Auto-pad horizontally so canvasW == canvasH (square output)"
+        , "  --compose-canvas-width N    Explicit composed canvas width"
+        , "  --compose-canvas-height N   Explicit composed canvas height"
         , "  --compose-font PATH         Outfit variable font path"
         , "  --compose-text TEXT         Subtitle text line 1"
         , "  --compose-text2 TEXT        Subtitle text line 2 (omit for single-line)"
