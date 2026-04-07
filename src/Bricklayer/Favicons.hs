@@ -14,8 +14,8 @@ generateFavicons :: FilePath -> FilePath -> IO ()
 generateFavicons squareSvgPath faviconDir = do
     createDirectoryIfMissing True faviconDir
 
-    forM_ sizes $ \(sz, name, bg) ->
-        exportPngSquareTrimmed squareSvgPath (faviconDir ++ "/" ++ name ++ ".png") sz bg
+    forM_ sizes $ \(sz, name, bg, paddingFraction) ->
+        exportPngSquareTrimmed squareSvgPath (faviconDir ++ "/" ++ name ++ ".png") sz bg paddingFraction
 
     -- Bundle 16, 32, 48, 64px PNGs into a multi-size favicon.ico
     callProcess
@@ -23,31 +23,31 @@ generateFavicons squareSvgPath faviconDir = do
         [ "--create"
         , "-o"
         , faviconDir ++ "/favicon.ico"
-        , faviconDir ++ "/favicon-16.png"
-        , faviconDir ++ "/favicon-32.png"
-        , faviconDir ++ "/favicon-48.png"
-        , faviconDir ++ "/favicon-64.png"
+        , faviconDir ++ "/favicon-16x16.png"
+        , faviconDir ++ "/favicon-32x32.png"
+        , faviconDir ++ "/favicon-48x48.png"
+        , faviconDir ++ "/favicon-64x64.png"
         ]
 
     putStrLn $ "  Wrote " ++ faviconDir ++ "/favicon.ico"
   where
-    sizes :: [(Int, String, String)]
+    sizes :: [(Int, String, String, Double)]
     sizes =
         -- Browser favicons (transparent — browsers render over tab chrome)
-        [ (16, "favicon-16", "transparent")
-        , (32, "favicon-32", "transparent")
-        , (48, "favicon-48", "transparent")
-        , (64, "favicon-64", "transparent")
+        [ (16, "favicon-16x16", "transparent", 0)
+        , (32, "favicon-32x32", "transparent", 0)
+        , (48, "favicon-48x48", "transparent", 0)
+        , (64, "favicon-64x64", "transparent", 0)
         , -- Apple touch icons (#05131D / black — iOS does not support transparency)
-          (120, "apple-touch-icon-120", "#05131D")
-        , (152, "apple-touch-icon-152", "#05131D")
-        , (167, "apple-touch-icon-167", "#05131D")
-        , (180, "apple-touch-icon", "#05131D")
-        , (192, "apple-touch-icon-192", "#05131D")
-        , (512, "apple-touch-icon-512", "#05131D")
+          (120, "apple-touch-icon-120", "#05131D", 0.15)
+        , (152, "apple-touch-icon-152", "#05131D", 0.15)
+        , (167, "apple-touch-icon-167", "#05131D", 0.15)
+        , (180, "apple-touch-icon", "#05131D", 0.15)
+        , (192, "apple-touch-icon-192", "#05131D", 0.15)
+        , (512, "apple-touch-icon-512", "#05131D", 0.15)
         , -- PWA icons (transparent — keep the source artwork alpha intact)
-          (192, "icon-192", "transparent")
-        , (512, "icon-512", "transparent")
-        , -- Maskable icon (transparent — OS applies adaptive mask and supplies background)
-          (512, "icon-maskable", "transparent")
+          (192, "icon-192", "transparent", 0)
+        , (512, "icon-512", "transparent", 0)
+        , -- Maskable icon matches Apple touch background and keeps safe-zone padding
+          (512, "icon-maskable", "#05131D", 0.15)
         ]

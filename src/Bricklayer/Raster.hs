@@ -43,13 +43,13 @@ exportPngSquare svgIn pngOut sizePx = do
 actual brick content fills as much of the target square as possible.
 Steps:
   1. Render at 8× the target size for accurate trim detection.
-  2. Use ImageMagick to trim transparent edges, pad back to square,
-     and scale to the target size.
+  2. Use ImageMagick to trim transparent edges, optionally add outer
+     padding, pad back to square, and scale to the target size.
 Only the content bounding box is used; transparent letterbox/pillarbox
 from pad-left/pad-right/pad-top/pad-bottom in the source layout is removed.
 -}
-exportPngSquareTrimmed :: FilePath -> FilePath -> Int -> String -> IO ()
-exportPngSquareTrimmed svgIn pngOut sizePx bgColor = do
+exportPngSquareTrimmed :: FilePath -> FilePath -> Int -> String -> Double -> IO ()
+exportPngSquareTrimmed svgIn pngOut sizePx bgColor paddingFraction = do
     putStrLn $ "  raster (square, trimmed) " ++ svgIn ++ " -> " ++ pngOut
     let sz = show sizePx
         renderSz = show (max 512 (sizePx * 8))
@@ -78,7 +78,9 @@ exportPngSquareTrimmed svgIn pngOut sizePx bgColor = do
     let (w, h) = case words dimStr of
             [ws, hs] -> (read ws :: Int, read hs :: Int)
             _ -> error $ "identify: unexpected output: " ++ dimStr
-        dim = show (max w h)
+        trimmedDim = max w h
+        paddedDim = max trimmedDim (ceiling (fromIntegral trimmedDim / (1 - (2 * paddingFraction))))
+        dim = show paddedDim
     -- Step 3: pad to square and scale to final size.
     callProcess
         "magick"
