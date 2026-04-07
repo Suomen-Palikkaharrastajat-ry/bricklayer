@@ -350,7 +350,7 @@ WEB_ICON_OUTPUTS := \
   $(FAVICON)/android-chrome-512x512.png \
   $(FAVICON)/icon-maskable.png
 
-# Default Open Graph image: horizontal full bold on a 1200x630 canvas
+# Default Open Graph image: horizontal full dark bold on a 1200x630 canvas
 $(OG_SVG) $(OG_PNG) $(OG_WEBP) &: layouts/horizontal.blay $(FONT_PATH) $(HS_SOURCES) | build
 	@mkdir -p $(FAVICON)
 	$(_RENDER) \
@@ -360,9 +360,9 @@ $(OG_SVG) $(OG_PNG) $(OG_WEBP) &: layouts/horizontal.blay $(FONT_PATH) $(HS_SOUR
 	  --compose-background    $(SUBTITLE_LIGHT) \
 	  --compose-canvas-width  $(OG_W) \
 	  --compose-canvas-height $(OG_H) \
-	  --compose-svg-out       $(OG_SVG) \
-	  --compose-png-out       $(OG_PNG) \
-	  --compose-webp-out      $(OG_WEBP)
+	  --compose-dark-svg-out  $(OG_SVG) \
+	  --compose-dark-png-out  $(OG_PNG) \
+	  --compose-dark-webp-out $(OG_WEBP)
 
 OG_IMAGE_OUTPUTS := $(OG_SVG) $(OG_PNG) $(OG_WEBP)
 
