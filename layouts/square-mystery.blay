@@ -1,0 +1,27 @@
+# brick-layout v1
+blk-w: 24
+blk-h: 20
+pad-top: 20
+pad-bottom: 20
+pad-left: 22
+pad-right: 23
+# palette: char = RRGGBB  (. = transparent)
+palette:
+  . = transparent
+  A = f2cd37
+  B = 151100
+# grid: 16×13
+grid:
+.....|AAAA|AA|.....
+.....|AA|AAAA|.....
+..|AAAA|AAAA|AAAA|..
+.|AAA|AAAA|AAAA|AAA|.
+.|AAAA|BBBB|BB|AAAA|.
+.|AAA|BB|AAAA|BB|AAA|.
+.|AAAA|AAAA|A|BB|AAA|.
+.|AAA|AAAA|BBB|AAAA|.
+.|AA|AAAA|BB|AAAA|AA|.
+.|AAA|AAAA|AAAA|AAA|.
+.|AAAA|AA|BB|AA|AAA|A|.
+..|AAAA|AAAA|AAA|A|..
+....|AAA|AAAA|A|....

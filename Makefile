@@ -103,6 +103,21 @@ layouts/square-blink.blay: layouts/head-blink.blay $(HS_SOURCES)
 layouts/square-laugh.blay: layouts/head-laugh.blay $(HS_SOURCES)
 	$(_COMPOSE) --input layouts/head-laugh.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
 
+layouts/square-mystery.blay: layouts/head-mystery.blay $(HS_SOURCES)
+	$(_COMPOSE) --input layouts/head-mystery.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
+
+layouts/square-video.blay: layouts/head-video.blay $(HS_SOURCES)
+	$(_COMPOSE) --input layouts/head-video.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
+
+layouts/square-marker.blay: layouts/head-marker.blay $(HS_SOURCES)
+	$(_COMPOSE) --input layouts/head-marker.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
+
+layouts/square-bookmark.blay: layouts/head-bookmark.blay $(HS_SOURCES)
+	$(_COMPOSE) --input layouts/head-bookmark.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
+
+layouts/square-construction.blay: layouts/head-construction.blay $(HS_SOURCES)
+	$(_COMPOSE) --input layouts/head-construction.blay:$(FACE_PH):$(SKIN_YELLOW) --output $@
+
 # Black-and-white square blays (white face, dark details)
 layouts/square-bw-basic.blay: layouts/head-basic.blay $(HS_SOURCES)
 	$(_COMPOSE) --input layouts/head-basic.blay:$(FACE_PH):$(SKIN_WHITE) --output $@
@@ -177,6 +192,9 @@ layouts/horizontal-bw.blay: $(_BW_SQ_BLAYS) $(HS_SOURCES)
 DERIVED_BLAYS := \
   layouts/square-basic.blay layouts/square-smile.blay \
   layouts/square-blink.blay layouts/square-laugh.blay \
+  layouts/square-mystery.blay layouts/square-video.blay \
+  layouts/square-marker.blay layouts/square-bookmark.blay \
+  layouts/square-construction.blay \
   layouts/square-bw-basic.blay layouts/square-bw-smile.blay \
   layouts/square-bw-blink.blay layouts/square-bw-laugh.blay \
   layouts/horizontal.blay layouts/horizontal-rot1.blay \
@@ -289,7 +307,7 @@ endef
 
 # square-basic is rendered by the favicon rule below (single grouped target);
 # the remaining square faces go through the render_square macro.
-_SQ_DERIVED := square-laugh square-blink square-basic square-bw-basic square-bw-smile square-bw-blink square-bw-laugh
+_SQ_DERIVED := square-laugh square-blink square-basic square-mystery square-video square-marker square-bookmark square-construction square-bw-basic square-bw-smile square-bw-blink square-bw-laugh
 SQ_STEMS    := square-smile $(_SQ_DERIVED)
 HZ_STEMS    := \
   horizontal horizontal-rot1 horizontal-rot2 horizontal-rot3 \
@@ -509,8 +527,8 @@ format: ## Auto-format Haskell source files
 # ── Watching ──────────────────────────────────────────────────────────────────
 
 .PHONY: watch
-watch: ## Re-run render on .hs/.cabal changes (requires entr)
-	find src app tests -name '*.hs' -o -name '*.cabal' | entr -r $(MAKE) render
+watch: ## Re-run dist on .hs/.cabal/.blay changes (requires entr)
+	{ find src app tests \( -name '*.hs' -o -name '*.cabal' \); find layouts -name '*.blay'; } | entr -r $(MAKE) dist
 
 # ── REPL ──────────────────────────────────────────────────────────────────────
 
